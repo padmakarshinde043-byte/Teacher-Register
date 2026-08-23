@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>शिक्षक नोंदवही</title>
+
+<style>
+  :root{
+    --paper:#F6F0E2;
+    --paper-2:#EFE7D3;
+    --ink:#2B2118;
+    --ink-soft:#5c5140;
+    --rule:#C9BFA5;
+    --maroon:#7A2E2E;
+    --maroon-dark:#5c2222;
+    --slate:#2F4F3E;
+    --slate-dark:#213b2d;
+    --ok:#3d6b4f;
+    --danger:#8a3a2f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--slate-dark);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.05), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 42px);
+    font-family:'Noto Sans Devanagari','Nirmala UI','Mangal',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:0 0 60px 0;
+  }
+  .topbar{
+    background:var(--slate);
+    border-bottom:3px double #d8c9a3;
+    padding:28px 20px 22px;
+    text-align:center;
+    color:var(--paper);
+    position:relative;
+  }
+  .topbar h1{
+    font-family:'Tiro Devanagari Marathi','Noto Serif Devanagari','Nirmala UI','Mangal',serif;
+    font-weight:400;
+    font-size:clamp(26px,5vw,36px);
+    margin:0 0 6px;
+    letter-spacing:0.5px;
+  }
+  .topbar p{
+    margin:0;
+    font-size:13px;
+    color:#cfd9d0;
+    letter-spacing:1px;
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .tabs{
+    display:flex;
+    gap:0;
+    margin:22px 0 0;
+    border-bottom:2px solid #d8c9a3;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:12px 8px;
+    font-family:'Tiro Devanagari Marathi','Noto Serif Devanagari','Nirmala UI','Mangal',serif;
+    font-size:17px;
+    color:#e7ded0;
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    transition:all .15s ease;
+    user-select:none;
+  }
+  .tab.active{
+    color:#fff;
+    border-bottom:3px solid #C9A24A;
+  }
+  .tab .count{
+    display:inline-block;
+    background:var(--maroon);
+    color:#fff;
+    font-family:'Noto Sans Devanagari',sans-serif;
+    font-size:11px;
+    padding:1px 7px;
+    border-radius:10px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .card{
+    background:var(--paper);
+    margin-top:18px;
+    border-radius:2px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:38px;
+    background:linear-gradient(180deg, var(--maroon), var(--maroon-dark));
+  }
+  .card::after{
+    content:'';
+    position:absolute;
+    left:12px;top:0;bottom:0;
+    width:2px;
+    background:repeating-linear-gradient(180deg,#e9d9a8 0 10px, transparent 10px 20px);
+    opacity:.6;
+  }
+  .card-inner{
+    padding:26px 24px 26px 58px;
+  }
+  .section-label{
+    font-family:'Tiro Devanagari Marathi','Noto Serif Devanagari','Nirmala UI','Mangal',serif;
+    font-size:15px;
+    color:var(--maroon);
+    letter-spacing:1px;
+    margin:26px 0 12px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:6px;
+  }
+  .section-label:first-child{margin-top:0;}
+  .field{
+    margin-bottom:18px;
+    position:relative;
+  }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+    letter-spacing:.3px;
+  }
+  .field label .req{color:var(--maroon); margin-left:2px;}
+  .field input, .field select, .field textarea{
+    width:100%;
+    border:none;
+    border-bottom:1.5px solid var(--rule);
+    background:transparent;
+    padding:8px 2px;
+    font-family:'Noto Sans Devanagari','Nirmala UI','Mangal',sans-serif;
+    font-size:15.5px;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-bottom:1.5px solid var(--maroon);
+  }
+  .field textarea{resize:vertical; min-height:44px;}
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 20px;
+  }
+  @media(max-width:520px){
+    .row2{grid-template-columns:1fr;}
+    .card-inner{padding:22px 16px 22px 46px;}
+  }
+  .submit-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:28px;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Tiro Devanagari Marathi','Noto Serif Devanagari','Nirmala UI','Mangal',serif;
+    font-size:16px;
+    padding:11px 26px;
+    border:none;
+    border-radius:2px;
+    cursor:pointer;
+    letter-spacing:.5px;
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .btn-primary{
+    background:var(--slate);
+    color:#fff;
+  }
+  .btn-primary:hover{background:var(--slate-dark);}
+  .btn-primary:active{transform:scale(0.98);}
+  .btn-primary:disabled{opacity:.6; cursor:not-allowed;}
+  .hint{font-size:12px; color:var(--ink-soft);}
+  .status-msg{
+    font-size:13.5px;
+    padding:10px 14px;
+    border-radius:2px;
+    margin-top:14px;
+    display:none;
+  }
+  .status-msg.show{display:block;}
+  .status-msg.ok{background:#e4efe6; color:var(--ok); border-left:3px solid var(--ok);}
+  .status-msg.err{background:#f4e3e0; color:var(--danger); border-left:3px solid var(--danger);}
+
+  /* Records view */
+  .toolbar{
+    display:flex;
+    gap:10px;
+    margin:18px 0 0;
+    flex-wrap:wrap;
+  }
+  .search-input{
+    flex:1;
+    min-width:180px;
+    background:var(--paper);
+    border:none;
+    padding:11px 14px;
+    font-family:'Noto Sans Devanagari','Nirmala UI','Mangal',sans-serif;
+    font-size:14.5px;
+    border-radius:2px;
+    outline:none;
+    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+  }
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:#e7ded0;
+  }
+  .empty-state .big{
+    font-family:'Tiro Devanagari Marathi','Noto Serif Devanagari','Nirmala UI','Mangal',serif;
+    font-size:20px;
+    margin-bottom:6px;
+    color:#fff;
+  }
+  .entry{
+    background:var(--paper);
+    margin-top:14px;
+    border-radius:2px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    overflow:hidden;
+  }
+  .entry-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    cursor:pointer;
+  }
+  .entry-num{
+    font-family:'Tiro Devanagari Marathi','Noto Serif Devanagari','Nirmala UI','Mangal',serif;
+    font-size:15px;
+    color:#fff;
+    background:var(--maroon);
+    width:34px; height:34px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .entry-main{flex:1; min-width:0;}
+  .entry-name{font-size:16px; font-weight:600; color:var(--ink);}
+  .entry-sub{font-size:13px; color:var(--ink-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .entry-arrow{
+    font-size:14px; color:var(--ink-soft);
+    transition:transform .15s ease;
+  }
+  .entry.open .entry-arrow{transform:rotate(180deg);}
+  .entry-body{
+    display:none;
+    padding:0 18px 18px 66px;
+    border-top:1px dashed var(--rule);
+  }
+  .entry.open .entry-body{display:block; padding-top:14px;}
+  .detail-row{
+    display:flex;
+    padding:5px 0;
+    font-size:14px;
+    border-bottom:1px dotted #e3d9bf;
+  }
+  .detail-row:last-of-type{border-bottom:none;}
+  .detail-label{width:44%; color:var(--ink-soft); flex-shrink:0;}
+  .detail-value{color:var(--ink); word-break:break-word;}
+  .delete-btn{
+    margin-top:12px;
+    background:none;
+    border:1px solid var(--danger);
+    color:var(--danger);
+    padding:6px 14px;
+    font-size:12.5px;
+    border-radius:2px;
+    cursor:pointer;
+    font-family:'Noto Sans Devanagari','Nirmala UI','Mangal',sans-serif;
+  }
+  .delete-btn:hover{background:var(--danger); color:#fff;}
+  .loading{
+    text-align:center;
+    color:#e7ded0;
+    padding:40px 0;
+    font-size:14px;
+  }
+  .share-note{
+    font-size:12px;
+    color:#cfd9d0;
+    text-align:center;
+    margin-top:10px;
+    padding:0 20px;
+  }
+  .sheet-config{
+    background:rgba(255,255,255,0.06);
+    border:1px dashed rgba(255,255,255,0.25);
+    border-radius:2px;
+    margin-top:16px;
+    overflow:hidden;
+  }
+  .sheet-config-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    cursor:pointer;
+    color:#e7ded0;
+    font-size:13.5px;
+  }
+  .sheet-status{
+    font-size:11.5px;
+    padding:2px 9px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.12);
+  }
+  .sheet-status.connected{background:var(--ok); color:#fff;}
+  .sheet-config-panel{
+    display:none;
+    padding:0 16px 16px;
+  }
+  .sheet-config-panel.open{display:block;}
+  .sheet-config-desc{
+    font-size:12.5px;
+    color:#cfd9d0;
+    margin:0 0 10px;
+    line-height:1.5;
+  }
+  .sheet-config-panel .field input{
+    background:var(--paper);
+    padding:9px 10px;
+    border-bottom:none;
+    border-radius:2px;
+    font-size:13.5px;
+  }
+  .btn-secondary{
+    background:var(--maroon);
+    color:#fff;
+    font-size:13px;
+    padding:8px 18px;
+  }
+  .btn-secondary:hover{background:var(--maroon-dark);}
+  .btn-link{
+    background:none;
+    color:#cfd9d0;
+    font-size:12px;
+    padding:8px 10px;
+    text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>शिक्षक नोंदवही</h1>
+  <p>शाळेतील सर्व शिक्षकांची माहिती एकत्र जमा करण्यासाठी</p>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="form">नवीन नोंद</div>
+    <div class="tab" data-tab="records">सर्व नोंदी <span class="count" id="countBadge">0</span></div>
+  </div>
+
+  <!-- FORM VIEW -->
+  <div id="formView">
+    <form class="card" id="teacherForm">
+      <div class="card-inner">
+
+        <div class="section-label">वैयक्तिक माहिती</div>
+        <div class="field">
+          <label>पूर्ण नाव<span class="req">*</span></label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>पदनाम / हुद्दा</label>
+            <input type="text" name="designation">
+          </div>
+          <div class="field">
+            <label>विषय</label>
+            <input type="text" name="subject">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>जन्मतारीख</label>
+            <input type="date" name="dob">
+          </div>
+          <div class="field">
+            <label>लिंग</label>
+            <select name="gender">
+              <option value=""></option>
+              <option>पुरुष</option>
+              <option>स्त्री</option>
+              <option>इतर</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>रक्तगट</label>
+            <input type="text" name="bloodGroup" placeholder="उदा. B+">
+          </div>
+          <div class="field">
+            <label>वैवाहिक स्थिती</label>
+            <select name="marital">
+              <option value=""></option>
+              <option>अविवाहित</option>
+              <option>विवाहित</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-label">संपर्क तपशील</div>
+        <div class="field">
+          <label>संपूर्ण पत्ता</label>
+          <textarea name="address" rows="2"></textarea>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>संपर्क क्रमांक</label>
+            <input type="tel" name="phone">
+          </div>
+          <div class="field">
+            <label>ई-मेल आयडी</label>
+            <input type="email" name="email">
+          </div>
+        </div>
+        <div class="field">
+          <label>आपत्कालीन संपर्क व्यक्ती व क्रमांक</label>
+          <input type="text" name="emergency">
+        </div>
+
+        <div class="section-label">शैक्षणिक व सेवाविषयक माहिती</div>
+        <div class="row2">
+          <div class="field">
+            <label>शैक्षणिक पात्रता</label>
+            <input type="text" name="eduQual" placeholder="उदा. बी.ए., एम.ए.">
+          </div>
+          <div class="field">
+            <label>व्यावसायिक पात्रता</label>
+            <input type="text" name="profQual" placeholder="उदा. बी.एड.">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>एकूण अध्यापन अनुभव (वर्षे)</label>
+            <input type="number" name="experience" min="0">
+          </div>
+          <div class="field">
+            <label>रुजू दिनांक</label>
+            <input type="date" name="joinDate">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>सेवा प्रकार</label>
+            <select name="serviceType">
+              <option value=""></option>
+              <option>कायम</option>
+              <option>तात्पुरती</option>
+              <option>कंत्राटी</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>वर्ग / इयत्ता (नेमून दिलेला)</label>
+            <input type="text" name="assignedClass">
+          </div>
+        </div>
+
+        <div class="section-label">इतर</div>
+        <div class="field">
+          <label>अतिरिक्त कौशल्ये / उपक्रम</label>
+          <textarea name="skills" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label>शेरा (टीप)</label>
+          <textarea name="remarks" rows="2"></textarea>
+        </div>
+
+        <div class="submit-bar">
+          <span class="hint">फक्त नाव भरणे बंधनकारक आहे</span>
+          <button type="submit" class="btn btn-primary" id="submitBtn">नोंद जतन करा</button>
+        </div>
+        <div class="status-msg" id="statusMsg"></div>
+      </div>
+    </form>
+    <p class="share-note">ही नोंदवही शाळेतील सर्वांसाठी सामायिक (shared) आहे — भरलेली माहिती सर्व वापरकर्त्यांना "सर्व नोंदी" टॅबमध्ये दिसेल.</p>
+
+    <div class="sheet-config">
+      <div class="sheet-config-toggle" id="sheetConfigToggle">
+        <span id="sheetConfigLabel">🔗 गुगल शीट जोडणी सेट करा</span>
+        <span id="sheetConfigStatus" class="sheet-status"></span>
+      </div>
+      <div class="sheet-config-panel" id="sheetConfigPanel">
+        <p class="sheet-config-desc">Apps Script Web App URL इथे पेस्ट करा — एकदा जतन केल्यावर प्रत्येक नवीन नोंद आपोआप गुगल शीटमध्येही जाईल.</p>
+        <div class="field">
+          <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <button type="button" class="btn btn-secondary" id="saveSheetUrlBtn">जोडणी जतन करा</button>
+        <button type="button" class="btn btn-link" id="clearSheetUrlBtn">जोडणी काढा</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDS VIEW -->
+  <div id="recordsView" style="display:none;">
+    <div class="toolbar">
+      <input type="text" class="search-input" id="searchInput" placeholder="नावाने शोधा...">
+    </div>
+    <div id="recordsList"></div>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'teacher-register-entries';
+const SHEET_URL_KEY = 'sheet-webhook-url';
+let entries = [];
+let loaded = false;
+let sheetUrl = 'https://script.google.com/macros/s/AKfycbzY4XhojNek0XPePrEhorkb6Djzx5FQTPBx0yjQpX_smEPdBxMYAJ3T5FlsRfnqir4w/exec';
+
+const sheetConfigToggle = document.getElementById('sheetConfigToggle');
+const sheetConfigPanel = document.getElementById('sheetConfigPanel');
+const sheetConfigStatus = document.getElementById('sheetConfigStatus');
+const sheetUrlInput = document.getElementById('sheetUrlInput');
+const saveSheetUrlBtn = document.getElementById('saveSheetUrlBtn');
+const clearSheetUrlBtn = document.getElementById('clearSheetUrlBtn');
+
+sheetConfigToggle.addEventListener('click', () => {
+  sheetConfigPanel.classList.toggle('open');
+});
+
+async function loadSheetUrl(){
+  try{
+    if(window.storage && window.storage.get){
+      const result = await window.storage.get(SHEET_URL_KEY, true);
+      if(result && result.value) sheetUrl = result.value;
+    } else {
+      const saved = localStorage.getItem(SHEET_URL_KEY);
+      if(saved) sheetUrl = saved;
+    }
+  }catch(e){
+    try{
+      const saved = localStorage.getItem(SHEET_URL_KEY);
+      if(saved) sheetUrl = saved;
+    }catch(_){}
+  }
+  updateSheetStatus();
+}
+
+function updateSheetStatus(){
+  if(sheetUrl){
+    sheetConfigStatus.textContent = 'जोडलेले ✓';
+    sheetConfigStatus.classList.add('connected');
+    sheetUrlInput.value = sheetUrl;
+  }else{
+    sheetConfigStatus.textContent = 'जोडलेले नाही';
+    sheetConfigStatus.classList.remove('connected');
+    sheetUrlInput.value = '';
+  }
+}
+
+saveSheetUrlBtn.addEventListener('click', async () => {
+  const url = sheetUrlInput.value.trim();
+  if(!url){ return; }
+  saveSheetUrlBtn.disabled = true;
+  saveSheetUrlBtn.textContent = 'जतन होत आहे...';
+  try{
+    try{
+      if(window.storage && window.storage.set) await window.storage.set(SHEET_URL_KEY, url, true);
+      else localStorage.setItem(SHEET_URL_KEY, url);
+    }catch(_){
+      try{ localStorage.setItem(SHEET_URL_KEY, url); }catch(__){}
+    }
+    sheetUrl = url;
+    updateSheetStatus();
+  }catch(e){
+    alert('जोडणी जतन करताना अडचण आली.');
+  }finally{
+    saveSheetUrlBtn.disabled = false;
+    saveSheetUrlBtn.textContent = 'जोडणी जतन करा';
+  }
+});
+
+clearSheetUrlBtn.addEventListener('click', async () => {
+  try{
+    if(window.storage && window.storage.set) await window.storage.set(SHEET_URL_KEY, '', true);
+    else localStorage.removeItem(SHEET_URL_KEY);
+  }catch(e){
+    try{ localStorage.removeItem(SHEET_URL_KEY); }catch(_){}
+  }
+  sheetUrl = '';
+  updateSheetStatus();
+});
+
+async function pushToSheet(record){
+  if(!sheetUrl) return;
+  try{
+    await fetch(sheetUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(record)
+    });
+  }catch(e){
+    // Sheet push failed silently; the record is still saved locally in this artifact.
+  }
+}
+
+loadSheetUrl();
+
+const formView = document.getElementById('formView');
+const recordsView = document.getElementById('recordsView');
+const tabs = document.querySelectorAll('.tab');
+const countBadge = document.getElementById('countBadge');
+const recordsList = document.getElementById('recordsList');
+const searchInput = document.getElementById('searchInput');
+const statusMsg = document.getElementById('statusMsg');
+const submitBtn = document.getElementById('submitBtn');
+
+const fieldMeta = [
+  ['name','पूर्ण नाव'],
+  ['designation','पदनाम / हुद्दा'],
+  ['subject','विषय'],
+  ['dob','जन्मतारीख'],
+  ['gender','लिंग'],
+  ['bloodGroup','रक्तगट'],
+  ['marital','वैवाहिक स्थिती'],
+  ['address','संपूर्ण पत्ता'],
+  ['phone','संपर्क क्रमांक'],
+  ['email','ई-मेल आयडी'],
+  ['emergency','आपत्कालीन संपर्क'],
+  ['eduQual','शैक्षणिक पात्रता'],
+  ['profQual','व्यावसायिक पात्रता'],
+  ['experience','अध्यापन अनुभव (वर्षे)'],
+  ['joinDate','रुजू दिनांक'],
+  ['serviceType','सेवा प्रकार'],
+  ['assignedClass','वर्ग / इयत्ता'],
+  ['skills','अतिरिक्त कौशल्ये'],
+  ['remarks','शेरा'],
+];
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    if(tab.dataset.tab === 'form'){
+      formView.style.display = 'block';
+      recordsView.style.display = 'none';
+    } else {
+      formView.style.display = 'none';
+      recordsView.style.display = 'block';
+      if(!loaded) loadEntries();
+    }
+  });
+});
+
+async function storageGet(key, shared){
+  if(window.storage && window.storage.get) return await window.storage.get(key, shared);
+  const value = localStorage.getItem(key);
+  return value === null ? null : {value};
+}
+async function storageSet(key, value, shared){
+  if(window.storage && window.storage.set) return await window.storage.set(key, value, shared);
+  localStorage.setItem(key, value);
+  return true;
+}
+
+async function loadEntries(){
+  recordsList.innerHTML = '<div class="loading">माहिती जमा होत आहे...</div>';
+  try{
+    const result = await storageGet(STORE_KEY, true);
+    entries = result && result.value ? JSON.parse(result.value) : [];
+  }catch(e){
+    entries = [];
+  }
+  loaded = true;
+  renderEntries();
+}
+
+function renderEntries(){
+  const q = searchInput.value.trim().toLowerCase();
+  const filtered = q
+    ? entries.filter(e => (e.name||'').toLowerCase().includes(q))
+    : entries;
+
+  countBadge.textContent = entries.length;
+
+  if(filtered.length === 0){
+    recordsList.innerHTML = `<div class="empty-state">
+      <div class="big">अजून कोणतीही नोंद नाही</div>
+      <div>"नवीन नोंद" टॅबमधून पहिली माहिती भरा</div>
+    </div>`;
+    return;
+  }
+
+  recordsList.innerHTML = filtered.map((e, idx) => {
+    const realIdx = entries.indexOf(e);
+    const detailRows = fieldMeta
+      .filter(([key]) => e[key])
+      .map(([key,label]) => `<div class="detail-row"><div class="detail-label">${label}</div><div class="detail-value">${escapeHtml(e[key])}</div></div>`)
+      .join('');
+    return `
+      <div class="entry" data-idx="${realIdx}">
+        <div class="entry-head" onclick="toggleEntry(this)">
+          <div class="entry-num">${realIdx+1}</div>
+          <div class="entry-main">
+            <div class="entry-name">${escapeHtml(e.name || 'नाव नमूद नाही')}</div>
+            <div class="entry-sub">${escapeHtml([e.designation, e.subject].filter(Boolean).join(' · ') || ' ')}</div>
+          </div>
+          <div class="entry-arrow">▾</div>
+        </div>
+        <div class="entry-body">
+          ${detailRows || '<div class="detail-row"><div class="detail-value">इतर तपशील नाही</div></div>'}
+          <button class="delete-btn" onclick="deleteEntry(event, ${realIdx})">ही नोंद काढून टाका</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleEntry(headEl){
+  headEl.parentElement.classList.toggle('open');
+}
+
+async function deleteEntry(ev, idx){
+  ev.stopPropagation();
+  if(!confirm('ही नोंद कायमची काढायची आहे का?')) return;
+  entries.splice(idx, 1);
+  try{
+    await storageSet(STORE_KEY, JSON.stringify(entries), true);
+  }catch(e){
+    alert('नोंद काढताना अडचण आली, पुन्हा प्रयत्न करा.');
+    return;
+  }
+  renderEntries();
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+searchInput.addEventListener('input', renderEntries);
+
+document.getElementById('teacherForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const form = ev.target;
+  const data = new FormData(form);
+  const record = {};
+  fieldMeta.forEach(([key]) => { record[key] = (data.get(key) || '').toString().trim(); });
+
+  if(!record.name){
+    showStatus('कृपया शिक्षकाचे नाव भरा.', false);
+    return;
+  }
+
+  record.submittedAt = new Date().toISOString();
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'जतन होत आहे...';
+
+  try{
+    let current = [];
+    try{
+      const result = await storageGet(STORE_KEY, true);
+      current = result && result.value ? JSON.parse(result.value) : [];
+    }catch(e){
+      current = [];
+    }
+    current.push(record);
+    const saved = await storageSet(STORE_KEY, JSON.stringify(current), true);
+    if(!saved){
+      throw new Error('save failed');
+    }
+    entries = current;
+    loaded = true;
+    form.reset();
+    showStatus('नोंद यशस्वीरित्या जतन झाली ✓', true);
+  }catch(e){
+    showStatus('नोंद जतन करताना अडचण आली. कृपया पुन्हा प्रयत्न करा.', false);
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'नोंद जतन करा';
+  }
+});
+
+function showStatus(msg, ok){
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status-msg show ' + (ok ? 'ok' : 'err');
+  setTimeout(() => { statusMsg.className = 'status-msg'; }, 4000);
+}
+</script>
+
+</body>
+</html>
